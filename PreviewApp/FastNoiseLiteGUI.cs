@@ -35,6 +35,7 @@ public class FastNoiseLiteGUI : Form
     private DropDown RotationType3D;
     private NumericStepper Seed;
     private NumericStepper Frequency;
+    private NumericStepper Threshold;
 
     private DropDown FractalType;
     private NumericStepper FractalOctaves;
@@ -70,7 +71,7 @@ public class FastNoiseLiteGUI : Form
     private bool isScrolling = false;
     private float zPos = 0;
     private Size previewStartSize = new Size(768, 768);
-    private Size windowSizeOffset = new Size(334, 52);
+    private Size windowSizeOffset = new Size(334, 128);
 
     public FastNoiseLiteGUI()
     {
@@ -204,6 +205,11 @@ public class FastNoiseLiteGUI : Form
                 Frequency = new NumericStepper { Value = 0.02, DecimalPlaces = 3, Increment = 0.005 };
                 Frequency.ValueChanged += Generate;
                 AddToTableWithLabel(table, Frequency, "Frequency");
+                
+                // Threshold - Anything below this is treated as black
+                Threshold = new NumericStepper() { Value = -1f, DecimalPlaces = 2, Increment = 0.05f };
+                Threshold.ValueChanged += Generate;
+                AddToTableWithLabel(table, Threshold, "Threshold");
             }
 
             // Add fractal label
@@ -540,8 +546,10 @@ public class FastNoiseLiteGUI : Form
                             if (warp)
                                 warpNoise.DomainWarp(ref xf, ref yf);
 
-                                noise = genNoise.GetNoise(xf, yf);
+                            noise = genNoise.GetNoise(xf, yf);
                         }
+
+                        noise = MathF.Max((float) Threshold.Value, noise);
 
                         avg += noise;
                         maxN = Math.Max(maxN, noise);
