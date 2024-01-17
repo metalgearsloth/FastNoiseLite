@@ -27,6 +27,7 @@ public class FastNoiseLiteGUI : Form
 
     private NumericStepper PreviewWidth;
     private NumericStepper PreviewHeight;
+    private NumericStepper Scale;
     private CheckBox Invert;
     private CheckBox Is3D;
     private CheckBox VisualiseDomainWarp;
@@ -152,6 +153,13 @@ public class FastNoiseLiteGUI : Form
                     AddToTableWithLabel(table, stack, "Preview Size");
                 }
 
+                Scale = new NumericStepper()
+                {
+                    Value = 1.0,
+                };
+                Scale.ValueChanged += Generate;
+                AddToTableWithLabel(table, Scale, "Scale");
+                
                 // Invert
                 Invert = new CheckBox();
                 Invert.CheckedChanged += Generate;
@@ -656,7 +664,8 @@ public class FastNoiseLiteGUI : Form
 
             // Set image
             Bitmap = new Bitmap(w, h, PixelFormat.Format32bppRgb, ImageData);
-            Image.Image = Bitmap;
+            var icon = Bitmap.WithSize((int) (Bitmap.Width * Scale.Value), (int)(Bitmap.Height * Scale.Value));
+            Image.Image = icon;
 
             // Set info labels
             Time.Text = "Time (ms): " + sw.ElapsedMilliseconds.ToString();
